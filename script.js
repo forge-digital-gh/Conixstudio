@@ -1,39 +1,316 @@
-/* =========================================
-   CONIXSTUDIO JAVASCRIPT
-========================================= */
+// ===============================
+// CONIXSTUDIO GALLERIES
+// ===============================
+
+const galleries = {
+    studio: [
+        "images/studio.jpg",
+        "images/studio2.jpg",
+        "images/studio3.jpg",
+        "images/studio4.jpg",
+        "images/studio5.jpg",
+        "images/studio6.jpg",
+        "images/studio7.jpg",
+        "images/studio8.jpg"
+    ],
+
+    outdoor: [
+        "images/outdoor.jpg",
+        "images/outdoor2.jpg",
+        "images/outdoor3.jpg",
+        "images/outdoor4.jpg",
+        "images/outdoor5.jpg",
+        "images/outdoor6.jpg",
+        "images/outdoor7.jpg",
+        "images/outdoor8.jpg"
+    ],
+
+    concept: [
+        "images/concept.jpg",
+        "images/concept2.jpg",
+        "images/concept3.jpg",
+        "images/concept4.jpg",
+        "images/concept5.jpg",
+        "images/concept6.jpg",
+        "images/concept7.jpg",
+        "images/concept8.jpg"
+    ],
+
+    documentary: [
+        "images/documentary.jpg",
+        "images/documentary2.jpg",
+        "images/documentary3.jpg",
+        "images/documentary4.jpg",
+        "images/documentary5.jpg",
+        "images/documentary6.jpg",
+        "images/documentary7.jpg",
+        "images/documentary8.jpg"
+    ],
+
+    weddings: [
+        "images/weddings.jpg",
+        "images/weddings2.jpg",
+        "images/weddings3.jpg",
+        "images/weddings4.jpg",
+        "images/weddings5.jpg",
+        "images/weddings6.jpg",
+        "images/weddings7.jpg",
+        "images/weddings8.jpg"
+    ]
+};
 
 
-/* =========================================
-   PAGE LOADER
-========================================= */
+// ===============================
+// GALLERY ELEMENTS
+// ===============================
 
-window.addEventListener("load", () => {
+const galleryModal = document.getElementById("galleryModal");
+const galleryTitle = document.getElementById("galleryTitle");
+const galleryGrid = document.getElementById("galleryGrid");
+const galleryClose = document.querySelector(".gallery-close");
 
-    document.body.classList.add("loaded");
+
+// ===============================
+// OPEN GALLERY
+// ===============================
+
+function openGallery(service) {
+
+    if (!galleries[service]) {
+        console.error("Gallery not found:", service);
+        return;
+    }
+
+    galleryGrid.innerHTML = "";
+
+    const serviceNames = {
+        studio: "Studio Photography",
+        outdoor: "Outdoor Photography",
+        concept: "Concept Photography",
+        documentary: "Documentary Photography",
+        weddings: "Wedding Photography"
+    };
+
+    galleryTitle.textContent = serviceNames[service];
+
+    galleries[service].forEach((image, index) => {
+
+        const item = document.createElement("div");
+        item.className = "gallery-item";
+
+        const img = document.createElement("img");
+
+        img.src = image;
+        img.alt = serviceNames[service];
+        img.loading = "lazy";
+
+        // If an image doesn't exist, hide the broken image
+        img.onerror = function () {
+            console.warn("Image not found:", image);
+            item.remove();
+        };
+
+        item.appendChild(img);
+        galleryGrid.appendChild(item);
+    });
+
+    galleryModal.classList.add("active");
+    document.body.style.overflow = "hidden";
+}
+
+
+// ===============================
+// CLOSE GALLERY
+// ===============================
+
+function closeGallery() {
+    galleryModal.classList.remove("active");
+    document.body.style.overflow = "";
+}
+
+
+if (galleryClose) {
+    galleryClose.addEventListener("click", closeGallery);
+}
+
+
+// Close when clicking outside gallery
+
+if (galleryModal) {
+    galleryModal.addEventListener("click", function (e) {
+
+        if (e.target === galleryModal) {
+            closeGallery();
+        }
+
+    });
+}
+
+
+// Close with ESC key
+
+document.addEventListener("keydown", function (e) {
+
+    if (e.key === "Escape") {
+        closeGallery();
+    }
 
 });
 
 
-/* =========================================
-   YEAR
-========================================= */
+// ===============================
+// SERVICE CARDS
+// ===============================
 
-const year = document.getElementById("year");
+document.querySelectorAll("[data-gallery]").forEach(card => {
 
-if (year) {
-    year.textContent = new Date().getFullYear();
+    card.addEventListener("click", function () {
+
+        const service = this.dataset.gallery;
+
+        openGallery(service);
+
+    });
+
+});
+
+
+// ===============================
+// WHATSAPP BOOKING
+// ===============================
+
+const bookingForm = document.getElementById("bookingForm");
+
+if (bookingForm) {
+
+    bookingForm.addEventListener("submit", function (e) {
+
+        e.preventDefault();
+
+        const name = document.getElementById("name")?.value.trim();
+        const phone = document.getElementById("phone")?.value.trim();
+        const service = document.getElementById("service")?.value;
+        const date = document.getElementById("date")?.value;
+        const location = document.getElementById("location")?.value.trim();
+        const message = document.getElementById("message")?.value.trim();
+
+        if (!name || !phone || !service || !date || !location) {
+            alert("Please complete all required fields.");
+            return;
+        }
+
+        const formattedDate = new Date(date).toLocaleDateString(
+            "en-GH",
+            {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            }
+        );
+
+        const whatsappMessage = `Hello Conixstudio 👋
+
+I'd like to make a booking.
+
+📸 Service: ${service}
+👤 Name: ${name}
+📱 Phone: ${phone}
+📅 Preferred Date: ${formattedDate}
+📍 Location: ${location}
+
+💬 Shoot Details:
+${message || "No additional details provided."}
+
+Sent from the Conixstudio website.`;
+
+        const whatsappURL =
+            "https://wa.me/233543446000?text=" +
+            encodeURIComponent(whatsappMessage);
+
+        window.open(whatsappURL, "_blank");
+
+    });
+
 }
 
 
-/* =========================================
-   NAVBAR
-========================================= */
+// ===============================
+// MOBILE MENU
+// ===============================
+
+const menuToggle = document.querySelector(".menu-toggle");
+const navLinks = document.querySelector(".nav-links");
+
+if (menuToggle && navLinks) {
+
+    menuToggle.addEventListener("click", function () {
+
+        navLinks.classList.toggle("active");
+        menuToggle.classList.toggle("active");
+
+    });
+
+}
+
+
+// Close mobile menu after clicking a link
+
+document.querySelectorAll(".nav-links a").forEach(link => {
+
+    link.addEventListener("click", function () {
+
+        navLinks?.classList.remove("active");
+        menuToggle?.classList.remove("active");
+
+    });
+
+});
+
+
+// ===============================
+// SCROLL REVEAL
+// ===============================
+
+const revealElements = document.querySelectorAll(".reveal");
+
+const revealObserver = new IntersectionObserver(
+    entries => {
+
+        entries.forEach(entry => {
+
+            if (entry.isIntersecting) {
+
+                entry.target.classList.add("show");
+
+                revealObserver.unobserve(entry.target);
+
+            }
+
+        });
+
+    },
+    {
+        threshold: 0.12
+    }
+);
+
+
+revealElements.forEach(element => {
+    revealObserver.observe(element);
+});
+
+
+// ===============================
+// NAVBAR SCROLL EFFECT
+// ===============================
 
 const navbar = document.querySelector(".navbar");
 
-window.addEventListener("scroll", () => {
+window.addEventListener("scroll", function () {
 
-    if (window.scrollY > 40) {
+    if (!navbar) return;
+
+    if (window.scrollY > 50) {
         navbar.classList.add("scrolled");
     } else {
         navbar.classList.remove("scrolled");
@@ -42,577 +319,27 @@ window.addEventListener("scroll", () => {
 });
 
 
-/* =========================================
-   MOBILE MENU
-========================================= */
-
-const menuToggle = document.querySelector(".menu-toggle");
-const mobileMenu = document.querySelector(".mobile-menu");
-
-if (menuToggle && mobileMenu) {
-
-    menuToggle.addEventListener("click", () => {
-
-        mobileMenu.classList.toggle("active");
-
-        document.body.classList.toggle("menu-open");
-
-    });
-
-
-    document.querySelectorAll(".mobile-menu a").forEach(link => {
-
-        link.addEventListener("click", () => {
-
-            mobileMenu.classList.remove("active");
-
-            document.body.classList.remove("menu-open");
-
-        });
-
-    });
-
-}
-
-
-/* =========================================
-   GALLERY FILTER
-========================================= */
-
-const filters = document.querySelectorAll(".filter");
-const galleryItems = document.querySelectorAll(".gallery-item");
-
-filters.forEach(filter => {
-
-    filter.addEventListener("click", () => {
-
-        filters.forEach(item => {
-            item.classList.remove("active");
-        });
-
-        filter.classList.add("active");
-
-        const selected = filter.dataset.filter;
-
-        galleryItems.forEach(item => {
-
-            const category = item.dataset.category;
-
-            if (
-                selected === "all" ||
-                category === selected
-            ) {
-
-                item.classList.remove("hidden");
-
-                item.style.animation = "galleryIn .6s ease";
-
-            } else {
-
-                item.classList.add("hidden");
-
-            }
-
-        });
-
-    });
-
-});
-
-
-/* =========================================
-   LIGHTBOX
-========================================= */
-
-const lightbox = document.querySelector(".lightbox");
-
-const lightboxImage =
-    document.querySelector(".lightbox-image");
-
-const lightboxTitle =
-    document.querySelector(".lightbox-title");
-
-const lightboxNumber =
-    document.querySelector(".lightbox-number");
-
-const closeLightbox =
-    document.querySelector(".lightbox-close");
-
-const nextButton =
-    document.querySelector(".lightbox-next");
-
-const prevButton =
-    document.querySelector(".lightbox-prev");
-
-
-let currentImage = 0;
-
-let visibleGalleryItems = [];
-
-
-function refreshVisibleItems() {
-
-    visibleGalleryItems = [
-        ...document.querySelectorAll(
-            ".gallery-item:not(.hidden)"
-        )
-    ];
-
-}
-
-
-function openLightbox(index) {
-
-    refreshVisibleItems();
-
-    if (!visibleGalleryItems.length) {
-        return;
-    }
-
-    currentImage = index;
-
-    const item = visibleGalleryItems[currentImage];
-
-    const image =
-        item.dataset.image;
-
-    const title =
-        item.dataset.title;
-
-    lightboxImage.src = image;
-
-    lightboxImage.alt = title;
-
-    lightboxTitle.textContent = title;
-
-    lightboxNumber.textContent =
-        `${String(currentImage + 1).padStart(2, "0")} / ${String(visibleGalleryItems.length).padStart(2, "0")}`;
-
-    lightbox.classList.add("active");
-
-    document.body.classList.add("lightbox-open");
-
-}
-
-
-function closeViewer() {
-
-    lightbox.classList.remove("active");
-
-    document.body.classList.remove("lightbox-open");
-
-}
-
-
-function nextImage() {
-
-    refreshVisibleItems();
-
-    if (!visibleGalleryItems.length) {
-        return;
-    }
-
-    currentImage++;
-
-    if (currentImage >= visibleGalleryItems.length) {
-        currentImage = 0;
-    }
-
-    showCurrentImage();
-
-}
-
-
-function previousImage() {
-
-    refreshVisibleItems();
-
-    if (!visibleGalleryItems.length) {
-        return;
-    }
-
-    currentImage--;
-
-    if (currentImage < 0) {
-        currentImage = visibleGalleryItems.length - 1;
-    }
-
-    showCurrentImage();
-
-}
-
-
-function showCurrentImage() {
-
-    const item =
-        visibleGalleryItems[currentImage];
-
-    lightboxImage.src =
-        item.dataset.image;
-
-    lightboxImage.alt =
-        item.dataset.title;
-
-    lightboxTitle.textContent =
-        item.dataset.title;
-
-    lightboxNumber.textContent =
-        `${String(currentImage + 1).padStart(2, "0")} / ${String(visibleGalleryItems.length).padStart(2, "0")}`;
-
-}
-
-
-/* Open image */
-
-galleryItems.forEach(item => {
-
-    item.addEventListener("click", () => {
-
-        refreshVisibleItems();
-
-        const index =
-            visibleGalleryItems.indexOf(item);
-
-        openLightbox(index);
-
-    });
-
-});
-
-
-/* Controls */
-
-if (closeLightbox) {
-
-    closeLightbox.addEventListener(
-        "click",
-        closeViewer
-    );
-
-}
-
-if (nextButton) {
-
-    nextButton.addEventListener(
-        "click",
-        nextImage
-    );
-
-}
-
-if (prevButton) {
-
-    prevButton.addEventListener(
-        "click",
-        previousImage
-    );
-
-}
-
-
-/* Click outside */
-
-if (lightbox) {
-
-    lightbox.addEventListener("click", event => {
-
-        if (
-            event.target === lightbox
-        ) {
-
-            closeViewer();
-
-        }
-
-    });
-
-}
-
-
-/* Keyboard */
-
-document.addEventListener("keydown", event => {
-
-    if (!lightbox.classList.contains("active")) {
-        return;
-    }
-
-    if (event.key === "Escape") {
-        closeViewer();
-    }
-
-    if (event.key === "ArrowRight") {
-        nextImage();
-    }
-
-    if (event.key === "ArrowLeft") {
-        previousImage();
-    }
-
-});
-
-
-/* =========================================
-   SMOOTH SCROLL
-========================================= */
+// ===============================
+// SMOOTH SCROLL
+// ===============================
 
 document.querySelectorAll('a[href^="#"]').forEach(link => {
 
-    link.addEventListener("click", event => {
+    link.addEventListener("click", function (e) {
 
-        const target =
-            document.querySelector(
-                link.getAttribute("href")
-            );
+        const target = document.querySelector(this.getAttribute("href"));
 
-        if (!target) {
-            return;
-        }
+        if (target) {
 
-        event.preventDefault();
+            e.preventDefault();
 
-        target.scrollIntoView({
-            behavior: "smooth"
-        });
-
-    });
-
-});
-
-
-/* =========================================
-   REVIEW SLIDER
-========================================= */
-
-const reviews =
-    document.querySelectorAll(".review");
-
-const prevReview =
-    document.getElementById("prevReview");
-
-const nextReview =
-    document.getElementById("nextReview");
-
-const reviewCounter =
-    document.querySelector(".review-counter");
-
-
-let currentReview = 0;
-
-
-function showReview(index) {
-
-    reviews.forEach(review => {
-
-        review.classList.remove("active");
-
-    });
-
-    reviews[index].classList.add("active");
-
-    if (reviewCounter) {
-
-        reviewCounter.textContent =
-            `${String(index + 1).padStart(2, "0")} — ${String(reviews.length).padStart(2, "0")}`;
-
-    }
-
-}
-
-
-if (nextReview) {
-
-    nextReview.addEventListener("click", () => {
-
-        currentReview++;
-
-        if (currentReview >= reviews.length) {
-            currentReview = 0;
-        }
-
-        showReview(currentReview);
-
-    });
-
-}
-
-
-if (prevReview) {
-
-    prevReview.addEventListener("click", () => {
-
-        currentReview--;
-
-        if (currentReview < 0) {
-            currentReview = reviews.length - 1;
-        }
-
-        showReview(currentReview);
-
-    });
-
-}
-
-
-/* =========================================
-   IMAGE FALLBACK
-========================================= */
-
-document.querySelectorAll("img").forEach(image => {
-
-    image.addEventListener("error", () => {
-
-        image.style.background =
-            "linear-gradient(135deg,#0b1a2a,#102a43)";
-
-        image.style.objectFit = "cover";
-
-    });
-
-});
-
-
-/* =========================================
-   REVEAL ANIMATION
-========================================= */
-
-const revealElements =
-    document.querySelectorAll(
-        ".intro, .gallery-item, .about, .service, .review, .contact"
-    );
-
-
-revealElements.forEach(element => {
-
-    element.classList.add("reveal");
-
-});
-
-
-const revealObserver =
-    new IntersectionObserver(
-        entries => {
-
-            entries.forEach(entry => {
-
-                if (entry.isIntersecting) {
-
-                    entry.target.classList.add("visible");
-
-                    revealObserver.unobserve(
-                        entry.target
-                    );
-
-                }
-
+            target.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
             });
 
-        },
-        {
-            threshold: .12
         }
-    );
 
-
-revealElements.forEach(element => {
-
-    revealObserver.observe(element);
-
-});
-
-
-/* =========================================
-   GALLERY ANIMATION
-========================================= */
-
-const style =
-    document.createElement("style");
-
-style.innerHTML = `
-
-@keyframes galleryIn {
-
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-}
-
-`;
-
-document.head.appendChild(style);
-
-
-/* =========================================
-   TOUCH SWIPE FOR LIGHTBOX
-========================================= */
-
-let touchStartX = 0;
-let touchEndX = 0;
-
-
-if (lightbox) {
-
-    lightbox.addEventListener(
-        "touchstart",
-        event => {
-
-            touchStartX =
-                event.changedTouches[0].screenX;
-
-        },
-        { passive: true }
-    );
-
-
-    lightbox.addEventListener(
-        "touchend",
-        event => {
-
-            touchEndX =
-                event.changedTouches[0].screenX;
-
-            handleSwipe();
-
-        },
-        { passive: true }
-    );
-
-}
-
-
-function handleSwipe() {
-
-    const distance =
-        touchEndX - touchStartX;
-
-    if (Math.abs(distance) < 50) {
-        return;
-    }
-
-    if (distance < 0) {
-        nextImage();
-    } else {
-        previousImage();
-    }
-
-}
-
-
-/* =========================================
-   PREVENT EMPTY IMAGE LINKS
-========================================= */
-
-document.querySelectorAll(
-    'img[src=""]'
-).forEach(image => {
-
-    image.removeAttribute("src");
+    });
 
 });
