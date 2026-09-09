@@ -1,326 +1,184 @@
-/* =========================================
-   CONIXSTUDIO JAVASCRIPT
-========================================= */
+// ==========================================
+// CONIXSTUDIO - SCRIPT.JS
+// ==========================================
 
 
-/* =========================================
-   PAGE LOADER
-========================================= */
+// ==========================================
+// GALLERIES
+// ==========================================
 
-window.addEventListener("load", () => {
+const galleries = {
 
-    document.body.classList.add("loaded");
+    studio: [
+        "images/studio.jpg",
+        "images/studio2.jpg",
+        "images/studio3.jpg",
+        "images/studio4.jpg",
+        "images/studio5.jpg",
+        "images/studio6.jpg",
+        "images/studio7.jpg",
+        "images/studio8.jpg"
+    ],
 
-});
+    outdoor: [
+        "images/outdoor.jpg",
+        "images/outdoor2.jpg",
+        "images/outdoor3.jpg",
+        "images/outdoor4.jpg",
+        "images/outdoor5.jpg",
+        "images/outdoor6.jpg",
+        "images/outdoor7.jpg"
+    ],
 
+    concept: [
+        "images/concept.jpg",
+        "images/concept2.jpg"
+    ],
 
-/* =========================================
-   YEAR
-========================================= */
+    documentary: [
+        "images/documentary.jpg",
+        "images/documentary2.jpg",
+        "images/documentary3.jpg"
+    ],
 
-const year = document.getElementById("year");
+    weddings: [
+        "images/weddings.jpg",
+        "images/weddings2.jpg"
+    ]
 
-if (year) {
-    year.textContent = new Date().getFullYear();
-}
+};
 
 
-/* =========================================
-   NAVBAR
-========================================= */
+// ==========================================
+// GALLERY TITLES
+// ==========================================
 
-const navbar = document.querySelector(".navbar");
+const galleryNames = {
 
-window.addEventListener("scroll", () => {
+    studio: "Studio Photography",
 
-    if (window.scrollY > 40) {
-        navbar.classList.add("scrolled");
-    } else {
-        navbar.classList.remove("scrolled");
-    }
+    outdoor: "Outdoor Photography",
 
-});
+    concept: "Concept Photography",
 
+    documentary: "Documentary Photography",
 
-/* =========================================
-   MOBILE MENU
-========================================= */
+    weddings: "Wedding Photography"
 
-const menuToggle = document.querySelector(".menu-toggle");
-const mobileMenu = document.querySelector(".mobile-menu");
+};
 
-if (menuToggle && mobileMenu) {
 
-    menuToggle.addEventListener("click", () => {
+// ==========================================
+// GALLERY ELEMENTS
+// ==========================================
 
-        mobileMenu.classList.toggle("active");
+const galleryModal = document.getElementById("galleryModal");
+const galleryTitle = document.getElementById("galleryTitle");
+const galleryGrid = document.getElementById("galleryGrid");
 
-        document.body.classList.toggle("menu-open");
+const galleryClose = document.querySelector(".gallery-close");
 
-    });
 
+// ==========================================
+// OPEN GALLERY
+// ==========================================
 
-    document.querySelectorAll(".mobile-menu a").forEach(link => {
+function openGallery(service) {
 
-        link.addEventListener("click", () => {
-
-            mobileMenu.classList.remove("active");
-
-            document.body.classList.remove("menu-open");
-
-        });
-
-    });
-
-}
-
-
-/* =========================================
-   GALLERY FILTER
-========================================= */
-
-const filters = document.querySelectorAll(".filter");
-const galleryItems = document.querySelectorAll(".gallery-item");
-
-filters.forEach(filter => {
-
-    filter.addEventListener("click", () => {
-
-        filters.forEach(item => {
-            item.classList.remove("active");
-        });
-
-        filter.classList.add("active");
-
-        const selected = filter.dataset.filter;
-
-        galleryItems.forEach(item => {
-
-            const category = item.dataset.category;
-
-            if (
-                selected === "all" ||
-                category === selected
-            ) {
-
-                item.classList.remove("hidden");
-
-                item.style.animation = "galleryIn .6s ease";
-
-            } else {
-
-                item.classList.add("hidden");
-
-            }
-
-        });
-
-    });
-
-});
-
-
-/* =========================================
-   LIGHTBOX
-========================================= */
-
-const lightbox = document.querySelector(".lightbox");
-
-const lightboxImage =
-    document.querySelector(".lightbox-image");
-
-const lightboxTitle =
-    document.querySelector(".lightbox-title");
-
-const lightboxNumber =
-    document.querySelector(".lightbox-number");
-
-const closeLightbox =
-    document.querySelector(".lightbox-close");
-
-const nextButton =
-    document.querySelector(".lightbox-next");
-
-const prevButton =
-    document.querySelector(".lightbox-prev");
-
-
-let currentImage = 0;
-
-let visibleGalleryItems = [];
-
-
-function refreshVisibleItems() {
-
-    visibleGalleryItems = [
-        ...document.querySelectorAll(
-            ".gallery-item:not(.hidden)"
-        )
-    ];
-
-}
-
-
-function openLightbox(index) {
-
-    refreshVisibleItems();
-
-    if (!visibleGalleryItems.length) {
+    if (!galleries[service]) {
+        console.error("Gallery not found:", service);
         return;
     }
 
-    currentImage = index;
-
-    const item = visibleGalleryItems[currentImage];
-
-    const image =
-        item.dataset.image;
-
-    const title =
-        item.dataset.title;
-
-    lightboxImage.src = image;
-
-    lightboxImage.alt = title;
-
-    lightboxTitle.textContent = title;
-
-    lightboxNumber.textContent =
-        `${String(currentImage + 1).padStart(2, "0")} / ${String(visibleGalleryItems.length).padStart(2, "0")}`;
-
-    lightbox.classList.add("active");
-
-    document.body.classList.add("lightbox-open");
-
-}
-
-
-function closeViewer() {
-
-    lightbox.classList.remove("active");
-
-    document.body.classList.remove("lightbox-open");
-
-}
-
-
-function nextImage() {
-
-    refreshVisibleItems();
-
-    if (!visibleGalleryItems.length) {
+    if (!galleryModal || !galleryGrid || !galleryTitle) {
+        console.error("Gallery elements missing from HTML.");
         return;
     }
 
-    currentImage++;
 
-    if (currentImage >= visibleGalleryItems.length) {
-        currentImage = 0;
-    }
-
-    showCurrentImage();
-
-}
+    // Clear previous gallery
+    galleryGrid.innerHTML = "";
 
 
-function previousImage() {
-
-    refreshVisibleItems();
-
-    if (!visibleGalleryItems.length) {
-        return;
-    }
-
-    currentImage--;
-
-    if (currentImage < 0) {
-        currentImage = visibleGalleryItems.length - 1;
-    }
-
-    showCurrentImage();
-
-}
+    // Set gallery title
+    galleryTitle.textContent = galleryNames[service];
 
 
-function showCurrentImage() {
+    // Create images
+    galleries[service].forEach((image, index) => {
 
-    const item =
-        visibleGalleryItems[currentImage];
+        const galleryItem = document.createElement("div");
 
-    lightboxImage.src =
-        item.dataset.image;
-
-    lightboxImage.alt =
-        item.dataset.title;
-
-    lightboxTitle.textContent =
-        item.dataset.title;
-
-    lightboxNumber.textContent =
-        `${String(currentImage + 1).padStart(2, "0")} / ${String(visibleGalleryItems.length).padStart(2, "0")}`;
-
-}
+        galleryItem.className = "gallery-item";
 
 
-/* Open image */
+        const img = document.createElement("img");
 
-galleryItems.forEach(item => {
+        img.src = image;
 
-    item.addEventListener("click", () => {
+        img.alt = `${galleryNames[service]} ${index + 1}`;
 
-        refreshVisibleItems();
+        img.loading = "lazy";
 
-        const index =
-            visibleGalleryItems.indexOf(item);
 
-        openLightbox(index);
+        // Prevent broken images from appearing
+        img.onerror = function () {
+
+            console.warn("Could not load:", image);
+
+            galleryItem.remove();
+
+        };
+
+
+        galleryItem.appendChild(img);
+
+        galleryGrid.appendChild(galleryItem);
 
     });
 
-});
 
+    // Open modal
+    galleryModal.classList.add("active");
 
-/* Controls */
-
-if (closeLightbox) {
-
-    closeLightbox.addEventListener(
-        "click",
-        closeViewer
-    );
-
-}
-
-if (nextButton) {
-
-    nextButton.addEventListener(
-        "click",
-        nextImage
-    );
-
-}
-
-if (prevButton) {
-
-    prevButton.addEventListener(
-        "click",
-        previousImage
-    );
+    document.body.style.overflow = "hidden";
 
 }
 
 
-/* Click outside */
+// ==========================================
+// CLOSE GALLERY
+// ==========================================
 
-if (lightbox) {
+function closeGallery() {
 
-    lightbox.addEventListener("click", event => {
+    if (!galleryModal) return;
 
-        if (
-            event.target === lightbox
-        ) {
+    galleryModal.classList.remove("active");
 
-            closeViewer();
+    document.body.style.overflow = "";
+
+}
+
+
+// Close button
+
+if (galleryClose) {
+
+    galleryClose.addEventListener("click", closeGallery);
+
+}
+
+
+// Click outside gallery
+
+if (galleryModal) {
+
+    galleryModal.addEventListener("click", function (event) {
+
+        if (event.target === galleryModal) {
+
+            closeGallery();
 
         }
 
@@ -329,290 +187,281 @@ if (lightbox) {
 }
 
 
-/* Keyboard */
+// ESC key
 
-document.addEventListener("keydown", event => {
-
-    if (!lightbox.classList.contains("active")) {
-        return;
-    }
+document.addEventListener("keydown", function (event) {
 
     if (event.key === "Escape") {
-        closeViewer();
-    }
 
-    if (event.key === "ArrowRight") {
-        nextImage();
-    }
+        closeGallery();
 
-    if (event.key === "ArrowLeft") {
-        previousImage();
     }
 
 });
 
 
-/* =========================================
-   SMOOTH SCROLL
-========================================= */
+// ==========================================
+// SERVICE CARDS
+// ==========================================
 
-document.querySelectorAll('a[href^="#"]').forEach(link => {
+document.querySelectorAll("[data-gallery]").forEach(card => {
 
-    link.addEventListener("click", event => {
+    card.addEventListener("click", function () {
 
-        const target =
-            document.querySelector(
-                link.getAttribute("href")
-            );
+        const service = this.getAttribute("data-gallery");
 
-        if (!target) {
-            return;
-        }
+        openGallery(service);
+
+    });
+
+});
+
+
+// ==========================================
+// WHATSAPP BOOKING
+// ==========================================
+
+const bookingForm = document.getElementById("bookingForm");
+
+if (bookingForm) {
+
+    bookingForm.addEventListener("submit", function (event) {
 
         event.preventDefault();
 
-        target.scrollIntoView({
-            behavior: "smooth"
-        });
+
+        const name =
+            document.getElementById("name")?.value.trim() || "";
+
+        const phone =
+            document.getElementById("phone")?.value.trim() || "";
+
+        const service =
+            document.getElementById("service")?.value || "";
+
+        const date =
+            document.getElementById("date")?.value || "";
+
+        const location =
+            document.getElementById("location")?.value.trim() || "";
+
+        const message =
+            document.getElementById("message")?.value.trim() || "";
+
+
+        // Required fields
+
+        if (!name || !phone || !service || !date || !location) {
+
+            alert("Please complete all required fields.");
+
+            return;
+
+        }
+
+
+        // Format date
+
+        let formattedDate = date;
+
+        if (date) {
+
+            formattedDate = new Date(date + "T00:00:00")
+                .toLocaleDateString("en-GH", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                });
+
+        }
+
+
+        // WhatsApp message
+
+        const whatsappMessage = `Hello Conixstudio 👋
+
+I'd like to make a booking.
+
+📸 Service: ${service}
+👤 Name: ${name}
+📱 Phone: ${phone}
+📅 Preferred Date: ${formattedDate}
+📍 Location: ${location}
+
+💬 Shoot Details:
+${message || "No additional details provided."}
+
+Sent from the Conixstudio website.`;
+
+
+        // WhatsApp number
+
+        const whatsappURL =
+            "https://wa.me/233543446000?text=" +
+            encodeURIComponent(whatsappMessage);
+
+
+        // Open WhatsApp
+
+        window.open(whatsappURL, "_blank");
+
+    });
+
+}
+
+
+// ==========================================
+// MOBILE MENU
+// ==========================================
+
+const menuToggle = document.querySelector(".menu-toggle");
+
+const navLinks = document.querySelector(".nav-links");
+
+
+if (menuToggle && navLinks) {
+
+    menuToggle.addEventListener("click", function () {
+
+        navLinks.classList.toggle("active");
+
+        menuToggle.classList.toggle("active");
+
+    });
+
+}
+
+
+// Close menu when clicking a link
+
+document.querySelectorAll(".nav-links a").forEach(link => {
+
+    link.addEventListener("click", function () {
+
+        navLinks?.classList.remove("active");
+
+        menuToggle?.classList.remove("active");
 
     });
 
 });
 
 
-/* =========================================
-   REVIEW SLIDER
-========================================= */
+// ==========================================
+// SCROLL REVEAL
+// ==========================================
 
-const reviews =
-    document.querySelectorAll(".review");
-
-const prevReview =
-    document.getElementById("prevReview");
-
-const nextReview =
-    document.getElementById("nextReview");
-
-const reviewCounter =
-    document.querySelector(".review-counter");
+const revealElements =
+    document.querySelectorAll(".reveal");
 
 
-let currentReview = 0;
+if ("IntersectionObserver" in window) {
+
+    const revealObserver =
+        new IntersectionObserver(
+            function (entries) {
+
+                entries.forEach(entry => {
+
+                    if (entry.isIntersecting) {
+
+                        entry.target.classList.add("show");
+
+                        revealObserver.unobserve(entry.target);
+
+                    }
+
+                });
+
+            },
+            {
+                threshold: 0.12
+            }
+        );
 
 
-function showReview(index) {
+    revealElements.forEach(element => {
 
-    reviews.forEach(review => {
-
-        review.classList.remove("active");
+        revealObserver.observe(element);
 
     });
 
-    reviews[index].classList.add("active");
+} else {
 
-    if (reviewCounter) {
+    // Fallback for older browsers
 
-        reviewCounter.textContent =
-            `${String(index + 1).padStart(2, "0")} — ${String(reviews.length).padStart(2, "0")}`;
+    revealElements.forEach(element => {
+
+        element.classList.add("show");
+
+    });
+
+}
+
+
+// ==========================================
+// NAVBAR SCROLL EFFECT
+// ==========================================
+
+const navbar =
+    document.querySelector(".navbar");
+
+
+window.addEventListener("scroll", function () {
+
+    if (!navbar) return;
+
+
+    if (window.scrollY > 50) {
+
+        navbar.classList.add("scrolled");
+
+    } else {
+
+        navbar.classList.remove("scrolled");
 
     }
 
-}
-
-
-if (nextReview) {
-
-    nextReview.addEventListener("click", () => {
-
-        currentReview++;
-
-        if (currentReview >= reviews.length) {
-            currentReview = 0;
-        }
-
-        showReview(currentReview);
-
-    });
-
-}
-
-
-if (prevReview) {
-
-    prevReview.addEventListener("click", () => {
-
-        currentReview--;
-
-        if (currentReview < 0) {
-            currentReview = reviews.length - 1;
-        }
-
-        showReview(currentReview);
-
-    });
-
-}
-
-
-/* =========================================
-   IMAGE FALLBACK
-========================================= */
-
-document.querySelectorAll("img").forEach(image => {
-
-    image.addEventListener("error", () => {
-
-        image.style.background =
-            "linear-gradient(135deg,#0b1a2a,#102a43)";
-
-        image.style.objectFit = "cover";
-
-    });
-
 });
 
 
-/* =========================================
-   REVEAL ANIMATION
-========================================= */
+// ==========================================
+// SMOOTH SCROLL
+// ==========================================
 
-const revealElements =
-    document.querySelectorAll(
-        ".intro, .gallery-item, .about, .service, .review, .contact"
-    );
+document.querySelectorAll('a[href^="#"]').forEach(link => {
 
+    link.addEventListener("click", function (event) {
 
-revealElements.forEach(element => {
+        const targetID =
+            this.getAttribute("href");
 
-    element.classList.add("reveal");
-
-});
+        const target =
+            document.querySelector(targetID);
 
 
-const revealObserver =
-    new IntersectionObserver(
-        entries => {
+        if (target) {
 
-            entries.forEach(entry => {
+            event.preventDefault();
 
-                if (entry.isIntersecting) {
+            target.scrollIntoView({
 
-                    entry.target.classList.add("visible");
+                behavior: "smooth",
 
-                    revealObserver.unobserve(
-                        entry.target
-                    );
-
-                }
+                block: "start"
 
             });
 
-        },
-        {
-            threshold: .12
         }
-    );
 
-
-revealElements.forEach(element => {
-
-    revealObserver.observe(element);
+    });
 
 });
 
 
-/* =========================================
-   GALLERY ANIMATION
-========================================= */
+// ==========================================
+// CONSOLE MESSAGE
+// ==========================================
 
-const style =
-    document.createElement("style");
-
-style.innerHTML = `
-
-@keyframes galleryIn {
-
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-}
-
-`;
-
-document.head.appendChild(style);
-
-
-/* =========================================
-   TOUCH SWIPE FOR LIGHTBOX
-========================================= */
-
-let touchStartX = 0;
-let touchEndX = 0;
-
-
-if (lightbox) {
-
-    lightbox.addEventListener(
-        "touchstart",
-        event => {
-
-            touchStartX =
-                event.changedTouches[0].screenX;
-
-        },
-        { passive: true }
-    );
-
-
-    lightbox.addEventListener(
-        "touchend",
-        event => {
-
-            touchEndX =
-                event.changedTouches[0].screenX;
-
-            handleSwipe();
-
-        },
-        { passive: true }
-    );
-
-}
-
-
-function handleSwipe() {
-
-    const distance =
-        touchEndX - touchStartX;
-
-    if (Math.abs(distance) < 50) {
-        return;
-    }
-
-    if (distance < 0) {
-        nextImage();
-    } else {
-        previousImage();
-    }
-
-}
-
-
-/* =========================================
-   PREVENT EMPTY IMAGE LINKS
-========================================= */
-
-document.querySelectorAll(
-    'img[src=""]'
-).forEach(image => {
-
-    image.removeAttribute("src");
-
-});
+console.log("Conixstudio website loaded successfully.");
+console.log("Gallery system ready.");
