@@ -1,11 +1,12 @@
-// ==========================================
-// CONIXSTUDIO - SCRIPT.JS
-// ==========================================
+/* =========================================================
+   CONIXSTUDIO — MAIN JAVASCRIPT
+   Collins Nixon Photography
+========================================================= */
 
 
-// ==========================================
-// GALLERIES
-// ==========================================
+/* =========================================================
+   GALLERIES
+========================================================= */
 
 const galleries = {
 
@@ -49,9 +50,9 @@ const galleries = {
 };
 
 
-// ==========================================
-// GALLERY TITLES
-// ==========================================
+/* =========================================================
+   GALLERY TITLES
+========================================================= */
 
 const galleryNames = {
 
@@ -68,217 +69,537 @@ const galleryNames = {
 };
 
 
-// ==========================================
-// GALLERY ELEMENTS
-// ==========================================
+/* =========================================================
+   GALLERY ELEMENTS
+========================================================= */
 
-const galleryModal = document.getElementById("galleryModal");
-const galleryTitle = document.getElementById("galleryTitle");
-const galleryGrid = document.getElementById("galleryGrid");
+const galleryModal =
+    document.getElementById("galleryModal");
 
-const galleryClose = document.querySelector(".gallery-close");
+const galleryGrid =
+    document.getElementById("galleryGrid");
+
+const galleryTitle =
+    document.getElementById("galleryTitle");
+
+const galleryClose =
+    document.getElementById("closeGallery");
 
 
-// ==========================================
-// OPEN GALLERY
-// ==========================================
+/* =========================================================
+   OPEN GALLERY
+========================================================= */
 
 function openGallery(service) {
 
     if (!galleries[service]) {
-        console.error("Gallery not found:", service);
+
+        console.error(
+            "Gallery not found:",
+            service
+        );
+
         return;
     }
 
-    if (!galleryModal || !galleryGrid || !galleryTitle) {
-        console.error("Gallery elements missing from HTML.");
+    if (
+        !galleryModal ||
+        !galleryGrid ||
+        !galleryTitle
+    ) {
+
+        console.error(
+            "Gallery HTML elements are missing."
+        );
+
         return;
     }
 
 
-    // Clear previous gallery
+    /* Clear previous images */
+
     galleryGrid.innerHTML = "";
 
 
-    // Set gallery title
-    galleryTitle.textContent = galleryNames[service];
+    /* Change title */
+
+    galleryTitle.textContent =
+        galleryNames[service];
 
 
-    // Create images
-    galleries[service].forEach((image, index) => {
+    /* Add images */
 
-        const galleryItem = document.createElement("div");
+    galleries[service].forEach(
+        (image, index) => {
 
-        galleryItem.className = "gallery-item";
+            const galleryItem =
+                document.createElement("div");
 
-
-        const img = document.createElement("img");
-
-        img.src = image;
-
-        img.alt = `${galleryNames[service]} ${index + 1}`;
-
-        img.loading = "lazy";
+            galleryItem.className =
+                "gallery-item";
 
 
-        // Prevent broken images from appearing
-        img.onerror = function () {
+            const img =
+                document.createElement("img");
 
-            console.warn("Could not load:", image);
+            img.src = image;
 
-            galleryItem.remove();
+            img.alt =
+                `${galleryNames[service]} ${index + 1}`;
 
-        };
-
-
-        galleryItem.appendChild(img);
-
-        galleryGrid.appendChild(galleryItem);
-
-    });
+            img.loading = "lazy";
 
 
-    // Open modal
+            /* If an image doesn't exist,
+               remove it instead of showing
+               a broken image icon. */
+
+            img.onerror = function () {
+
+                console.warn(
+                    "Image could not be loaded:",
+                    image
+                );
+
+                galleryItem.remove();
+
+            };
+
+
+            galleryItem.appendChild(img);
+
+            galleryGrid.appendChild(
+                galleryItem
+            );
+
+        }
+    );
+
+
+    /* Show gallery */
+
     galleryModal.classList.add("active");
 
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow =
+        "hidden";
 
 }
 
 
-// ==========================================
-// CLOSE GALLERY
-// ==========================================
+/* =========================================================
+   CLOSE GALLERY
+========================================================= */
 
 function closeGallery() {
 
     if (!galleryModal) return;
 
-    galleryModal.classList.remove("active");
+    galleryModal.classList.remove(
+        "active"
+    );
 
     document.body.style.overflow = "";
 
 }
 
 
-// Close button
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
 
 if (galleryClose) {
 
-    galleryClose.addEventListener("click", closeGallery);
+    galleryClose.addEventListener(
+        "click",
+        closeGallery
+    );
 
 }
 
 
-// Click outside gallery
+/* =========================================================
+   CLOSE WHEN CLICKING BACKGROUND
+========================================================= */
 
 if (galleryModal) {
 
-    galleryModal.addEventListener("click", function (event) {
+    galleryModal.addEventListener(
+        "click",
+        function (event) {
 
-        if (event.target === galleryModal) {
+            if (
+                event.target === galleryModal
+            ) {
+
+                closeGallery();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ESCAPE KEY
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (
+            event.key === "Escape"
+        ) {
 
             closeGallery();
 
         }
 
+    }
+);
+
+
+/* =========================================================
+   SERVICE / PORTFOLIO CLICK
+========================================================= */
+
+document
+    .querySelectorAll("[data-gallery]")
+    .forEach(card => {
+
+        card.addEventListener(
+            "click",
+            function () {
+
+                const service =
+                    this.getAttribute(
+                        "data-gallery"
+                    );
+
+                openGallery(service);
+
+            }
+        );
+
     });
+
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+const menuBtn =
+    document.getElementById("menuBtn");
+
+const navLinks =
+    document.getElementById("navLinks");
+
+
+if (
+    menuBtn &&
+    navLinks
+) {
+
+    menuBtn.addEventListener(
+        "click",
+        function () {
+
+            navLinks.classList.toggle(
+                "open"
+            );
+
+        }
+    );
 
 }
 
 
-// ESC key
+/* =========================================================
+   CLOSE MOBILE MENU AFTER CLICK
+========================================================= */
 
-document.addEventListener("keydown", function (event) {
+document
+    .querySelectorAll(".nav-links a")
+    .forEach(link => {
 
-    if (event.key === "Escape") {
+        link.addEventListener(
+            "click",
+            function () {
 
-        closeGallery();
+                navLinks?.classList.remove(
+                    "open"
+                );
 
-    }
-
-});
-
-
-// ==========================================
-// SERVICE CARDS
-// ==========================================
-
-document.querySelectorAll("[data-gallery]").forEach(card => {
-
-    card.addEventListener("click", function () {
-
-        const service = this.getAttribute("data-gallery");
-
-        openGallery(service);
+            }
+        );
 
     });
 
-});
+
+/* =========================================================
+   REVEAL ANIMATION
+========================================================= */
+
+const revealElements =
+    document.querySelectorAll(
+        ".reveal"
+    );
 
 
-// ==========================================
-// WHATSAPP BOOKING
-// ==========================================
+if (
+    "IntersectionObserver"
+    in window
+) {
 
-const bookingForm = document.getElementById("bookingForm");
+    const revealObserver =
+        new IntersectionObserver(
+            function (entries) {
+
+                entries.forEach(
+                    entry => {
+
+                        if (
+                            entry.isIntersecting
+                        ) {
+
+                            entry.target.classList.add(
+                                "show"
+                            );
+
+                            revealObserver.unobserve(
+                                entry.target
+                            );
+
+                        }
+
+                    }
+                );
+
+            },
+            {
+                threshold: 0.12
+            }
+        );
+
+
+    revealElements.forEach(
+        element => {
+
+            revealObserver.observe(
+                element
+            );
+
+        }
+    );
+
+} else {
+
+    revealElements.forEach(
+        element => {
+
+            element.classList.add(
+                "show"
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   NAVBAR SCROLL EFFECT
+========================================================= */
+
+const navbar =
+    document.querySelector("header");
+
+
+window.addEventListener(
+    "scroll",
+    function () {
+
+        if (!navbar) return;
+
+
+        if (
+            window.scrollY > 50
+        ) {
+
+            navbar.classList.add(
+                "scrolled"
+            );
+
+        } else {
+
+            navbar.classList.remove(
+                "scrolled"
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SMOOTH NAVIGATION
+========================================================= */
+
+document
+    .querySelectorAll(
+        'a[href^="#"]'
+    )
+    .forEach(link => {
+
+        link.addEventListener(
+            "click",
+            function (event) {
+
+                const targetID =
+                    this.getAttribute(
+                        "href"
+                    );
+
+
+                if (
+                    !targetID ||
+                    targetID === "#"
+                ) {
+                    return;
+                }
+
+
+                const target =
+                    document.querySelector(
+                        targetID
+                    );
+
+
+                if (target) {
+
+                    event.preventDefault();
+
+                    target.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+
+                }
+
+            }
+        );
+
+    });
+
+
+/* =========================================================
+   BOOKING → WHATSAPP
+========================================================= */
+
+const bookingForm =
+    document.getElementById(
+        "bookingForm"
+    );
+
 
 if (bookingForm) {
 
-    bookingForm.addEventListener("submit", function (event) {
+    bookingForm.addEventListener(
+        "submit",
+        function (event) {
 
-        event.preventDefault();
-
-
-        const name =
-            document.getElementById("name")?.value.trim() || "";
-
-        const phone =
-            document.getElementById("phone")?.value.trim() || "";
-
-        const service =
-            document.getElementById("service")?.value || "";
-
-        const date =
-            document.getElementById("date")?.value || "";
-
-        const location =
-            document.getElementById("location")?.value.trim() || "";
-
-        const message =
-            document.getElementById("message")?.value.trim() || "";
+            event.preventDefault();
 
 
-        // Required fields
-
-        if (!name || !phone || !service || !date || !location) {
-
-            alert("Please complete all required fields.");
-
-            return;
-
-        }
+            const name =
+                document
+                    .getElementById("name")
+                    ?.value
+                    .trim() || "";
 
 
-        // Format date
-
-        let formattedDate = date;
-
-        if (date) {
-
-            formattedDate = new Date(date + "T00:00:00")
-                .toLocaleDateString("en-GH", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric"
-                });
-
-        }
+            const phone =
+                document
+                    .getElementById("phone")
+                    ?.value
+                    .trim() || "";
 
 
-        // WhatsApp message
+            const service =
+                document
+                    .getElementById("service")
+                    ?.value || "";
 
-        const whatsappMessage = `Hello Conixstudio 👋
+
+            const date =
+                document
+                    .getElementById("date")
+                    ?.value || "";
+
+
+            const location =
+                document
+                    .getElementById("location")
+                    ?.value
+                    .trim() || "";
+
+
+            const message =
+                document
+                    .getElementById("message")
+                    ?.value
+                    .trim() || "";
+
+
+            /* Validate */
+
+            if (
+                !name ||
+                !phone ||
+                !service ||
+                !date ||
+                !location
+            ) {
+
+                alert(
+                    "Please complete all required fields."
+                );
+
+                return;
+
+            }
+
+
+            /* Format date */
+
+            let formattedDate =
+                date;
+
+
+            if (date) {
+
+                formattedDate =
+                    new Date(
+                        date + "T00:00:00"
+                    ).toLocaleDateString(
+                        "en-GH",
+                        {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric"
+                        }
+                    );
+
+            }
+
+
+            /* WhatsApp message */
+
+            const whatsappMessage =
+`Hello Conixstudio 👋
 
 I'd like to make a booking.
 
@@ -294,174 +615,144 @@ ${message || "No additional details provided."}
 Sent from the Conixstudio website.`;
 
 
-        // WhatsApp number
+            /* WhatsApp URL */
 
-        const whatsappURL =
-            "https://wa.me/233543446000?text=" +
-            encodeURIComponent(whatsappMessage);
-
-
-        // Open WhatsApp
-
-        window.open(whatsappURL, "_blank");
-
-    });
-
-}
+            const whatsappURL =
+                "https://wa.me/233543446000?text=" +
+                encodeURIComponent(
+                    whatsappMessage
+                );
 
 
-// ==========================================
-// MOBILE MENU
-// ==========================================
+            /* Open WhatsApp */
 
-const menuToggle = document.querySelector(".menu-toggle");
+            window.open(
+                whatsappURL,
+                "_blank"
+            );
 
-const navLinks = document.querySelector(".nav-links");
-
-
-if (menuToggle && navLinks) {
-
-    menuToggle.addEventListener("click", function () {
-
-        navLinks.classList.toggle("active");
-
-        menuToggle.classList.toggle("active");
-
-    });
+        }
+    );
 
 }
 
 
-// Close menu when clicking a link
+/* =========================================================
+   HERO PARALLAX
+========================================================= */
 
-document.querySelectorAll(".nav-links a").forEach(link => {
-
-    link.addEventListener("click", function () {
-
-        navLinks?.classList.remove("active");
-
-        menuToggle?.classList.remove("active");
-
-    });
-
-});
+const heroImage =
+    document.querySelector(
+        ".hero-image img"
+    );
 
 
-// ==========================================
-// SCROLL REVEAL
-// ==========================================
+window.addEventListener(
+    "scroll",
+    function () {
 
-const revealElements =
-    document.querySelectorAll(".reveal");
+        if (!heroImage) return;
 
 
-if ("IntersectionObserver" in window) {
+        const scroll =
+            window.scrollY;
 
-    const revealObserver =
-        new IntersectionObserver(
-            function (entries) {
 
-                entries.forEach(entry => {
+        if (
+            scroll <
+            window.innerHeight
+        ) {
 
-                    if (entry.isIntersecting) {
+            heroImage.style.transform =
+                `translateY(${scroll * 0.08}px) scale(1.02)`;
 
-                        entry.target.classList.add("show");
+        }
 
-                        revealObserver.unobserve(entry.target);
+    }
+);
 
-                    }
 
-                });
+/* =========================================================
+   ACTIVE NAVIGATION
+========================================================= */
 
-            },
-            {
-                threshold: 0.12
+const sections =
+    document.querySelectorAll(
+        "section[id]"
+    );
+
+
+const navItems =
+    document.querySelectorAll(
+        ".nav-links a"
+    );
+
+
+window.addEventListener(
+    "scroll",
+    function () {
+
+        let current = "";
+
+
+        sections.forEach(
+            section => {
+
+                const sectionTop =
+                    section.offsetTop - 150;
+
+
+                if (
+                    window.scrollY >=
+                    sectionTop
+                ) {
+
+                    current =
+                        section.getAttribute(
+                            "id"
+                        );
+
+                }
+
             }
         );
 
 
-    revealElements.forEach(element => {
+        navItems.forEach(
+            link => {
 
-        revealObserver.observe(element);
-
-    });
-
-} else {
-
-    // Fallback for older browsers
-
-    revealElements.forEach(element => {
-
-        element.classList.add("show");
-
-    });
-
-}
+                link.classList.remove(
+                    "active"
+                );
 
 
-// ==========================================
-// NAVBAR SCROLL EFFECT
-// ==========================================
+                if (
+                    link.getAttribute(
+                        "href"
+                    ) === "#" + current
+                ) {
 
-const navbar =
-    document.querySelector(".navbar");
+                    link.classList.add(
+                        "active"
+                    );
 
+                }
 
-window.addEventListener("scroll", function () {
-
-    if (!navbar) return;
-
-
-    if (window.scrollY > 50) {
-
-        navbar.classList.add("scrolled");
-
-    } else {
-
-        navbar.classList.remove("scrolled");
+            }
+        );
 
     }
-
-});
-
-
-// ==========================================
-// SMOOTH SCROLL
-// ==========================================
-
-document.querySelectorAll('a[href^="#"]').forEach(link => {
-
-    link.addEventListener("click", function (event) {
-
-        const targetID =
-            this.getAttribute("href");
-
-        const target =
-            document.querySelector(targetID);
+);
 
 
-        if (target) {
+/* =========================================================
+   PAGE LOADED
+========================================================= */
 
-            event.preventDefault();
+console.log(
+    "Conixstudio website loaded successfully."
+);
 
-            target.scrollIntoView({
-
-                behavior: "smooth",
-
-                block: "start"
-
-            });
-
-        }
-
-    });
-
-});
-
-
-// ==========================================
-// CONSOLE MESSAGE
-// ==========================================
-
-console.log("Conixstudio website loaded successfully.");
-console.log("Gallery system ready.");
+console.log(
+    "Gallery system ready."
+);
